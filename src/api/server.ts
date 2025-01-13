@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { addWatchedStock, getWatchedStocks } from '../activities/db';
+import { addWatchedStock, getWatchedStocks, getAnalyses } from '../activities';
 import { Stock } from '../types';
 
 const app = express();
@@ -36,6 +36,21 @@ app.post('/api/stocks', async (req, res) => {
     } catch (error) {
         console.error('Error adding stock:', error);
         res.status(500).json({ error: 'Failed to add stock' });
+    }
+});
+
+// Get AI recommendations
+app.get('/api/recommendations', async (req, res) => {
+    try {
+        const { symbol, limit } = req.query;
+        const analyses = await getAnalyses(
+            symbol as string | undefined,
+            limit ? parseInt(limit as string, 10) : undefined
+        );
+        res.json(analyses);
+    } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        res.status(500).json({ error: 'Failed to fetch recommendations' });
     }
 });
 

@@ -7,12 +7,6 @@ export interface Stock {
 export interface SMAData {
   timestamp: number;
   value: number;
-  url?: string;
-}
-
-export interface PolygonResponse {
-  results: SMAData[];
-  next_url?: string;
 }
 
 export interface StockAnalysis {

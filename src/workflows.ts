@@ -2,14 +2,26 @@ import { proxyActivities } from '@temporalio/workflow';
 import type * as activities from './activities';
 import { Stock, SMAData, StockAnalysis } from './types';
 
-const { 
+const {
   getWatchedStocks,
-  fetchSMAData,
-  saveSMAData,
+  fetchAllSMADataForStock,
+  getAllHistoricalSMAData,
   getAIRecommendation,
   saveAnalysis
 } = proxyActivities<typeof activities>({
-  startToCloseTimeout: '1 minute',
+  startToCloseTimeout: '1 hour',
+  retry: {
+    // No maximum attempts - will retry indefinitely
+    maximumAttempts: 5,
+    // Start with 10 seconds
+    initialInterval: '10 seconds',
+    // Double the interval each time
+    backoffCoefficient: 2,
+    // Maximum interval of 1 hour between retries
+    maximumInterval: '1 hour',
+    // Only retry on rate limit errors
+    nonRetryableErrorTypes: ['INVALID_API_KEY', 'API_ERROR']
+  }
 });
 
 export async function analyzeStocksWorkflow(): Promise<void> {
@@ -18,20 +30,16 @@ export async function analyzeStocksWorkflow(): Promise<void> {
 
   // Process each stock
   for (const stock of stocks) {
-    let allSMAData: SMAData[] = [];
-    let nextUrl: string | undefined = undefined;
+    // Fetch new SMA data using child activities
+    const newSMAData = await fetchAllSMADataForStock(stock.symbol);
 
-    // Fetch all SMA data pages
-    do {
-      const response = await fetchSMAData(stock.symbol, nextUrl);
-      allSMAData = [...allSMAData, ...response.results];
-      nextUrl = response.next_url;
-      
-      // Save each batch of SMA data
-      await saveSMAData(stock.symbol, response.results);
-    } while (nextUrl);
+    // Get all historical data (already sorted by timestamp desc)
+    const historicalData = await getAllHistoricalSMAData(stock.symbol);
 
-    // Get AI recommendation
+    // Combine historical and new data
+    const allSMAData = [...newSMAData, ...historicalData];
+
+    // Get AI recommendation based on all data
     const recommendation = await getAIRecommendation(stock.symbol, allSMAData);
 
     // Save the analysis
@@ -39,7 +47,7 @@ export async function analyzeStocksWorkflow(): Promise<void> {
       symbol: stock.symbol,
       timestamp: new Date(),
       recommendation,
-      confidence: 0.8, // This could be derived from the AI response
+      confidence: 0.8,
       smaData: allSMAData
     };
     await saveAnalysis(analysis);
