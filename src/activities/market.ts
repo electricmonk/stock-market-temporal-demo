@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { ApplicationFailure } from '@temporalio/activity';
-import { polygonResponseSchema } from '../schemas/polygon';
-import { SMAData } from '../types';
+import {polygonResponseSchema, SMAData} from '../types';
 import { saveSMAData } from './db';
 
 // Create an axios instance with default config for Polygon.io

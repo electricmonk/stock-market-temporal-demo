@@ -1,10 +1,9 @@
 import { config } from 'dotenv';
 import { beforeAll, afterEach, afterAll } from 'vitest';
 import { setupServer } from 'msw/node';
-import { handlers } from './mocks/handlers';
 
 // Setup MSW
-export const server = setupServer(...handlers);
+export const server = setupServer();
 
 // Start MSW server
 beforeAll(() => {
