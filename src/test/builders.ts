@@ -1,5 +1,5 @@
 import {builderFor} from "ts-byob";
-import {PolygonResponse, PolygonSMAValue} from "../types";
+import {PolygonResponse, PolygonSMAValue, SMAData} from "../types";
 
 export const anSMAValue = builderFor<PolygonSMAValue>( () => {
     return {
@@ -7,6 +7,14 @@ export const anSMAValue = builderFor<PolygonSMAValue>( () => {
         value: Math.random() * 100
     }
 })
+
+export const anSMADatum = builderFor<SMAData>( () => {
+    return {
+        timestamp: Date.now(),
+        value: Math.round(Math.random() * 100)
+    }
+})
+
 
 export const aPolygonResponse = (values: PolygonSMAValue[]) => {
     return {

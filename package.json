@@ -9,6 +9,7 @@
     "api": "tsx src/api/server.ts"
   },
   "dependencies": {
+    "@polygon.io/client-js": "^7.3.2",
     "@temporalio/activity": "^1.8.4",
     "@temporalio/client": "^1.8.4",
     "@temporalio/worker": "^1.8.4",
@@ -23,6 +24,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@temporalio/testing": "^1.11.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.0",
@@ -30,6 +32,7 @@
     "ts-byob": "^1.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2",
+    "uuid": "^11.0.5",
     "vitest": "^2.1.8"
   }
 }
